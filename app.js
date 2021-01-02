@@ -57,7 +57,7 @@ var questions = [
 	},
 	{
 		type: 'input',
-		name: 'emplid',
+		name: 'id',
 		message: "What is their employee ID number?",
 	},
 	{
@@ -73,11 +73,11 @@ function ask() {
   inquirer.prompt(questions).then((answers) => {
     output.push(answers.name);
 	output.push(answers.email);
-	output.push(answers.emplid);
+	output.push(answers.id);
 	output.push(answers.role);
 	if(answers.role === 'Manager'){
 		output.push(answers.office)
-	}
+	} 
 	else if (answers.role === 'Engineer'){
 		output.push(answers.github)
 	}	
