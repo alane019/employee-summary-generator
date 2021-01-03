@@ -3,17 +3,18 @@ const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");  // npm  module - inquirer 
 const path = require("path"); // node native module - path
-const fs = require("fs"); // node native module - fs, for 
-
+const fs = require("fs"); // node native module - fs
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
-
 const render = require("./lib/htmlRenderer");
+
+const employees = []; // array of employee objects
 
 // TODO  Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 'use strict';
 var output = [];
+
 var questions = [
 	{
 		type: 'input',
@@ -33,7 +34,7 @@ var questions = [
     },
 	{
 		type: 'input',
-		name: 'office',
+		name: 'officeNumber',
 		message: 'What is the office number of this manager? ',
 		when: function (answers) {
 		  return answers.role === 'Manager';
@@ -58,7 +59,7 @@ var questions = [
 	{
 		type: 'input',
 		name: 'id',
-		message: "What is their employee ID number?",
+		message: "What is the employee's ID number?",
 	},
 	{
 		type: 'confirm',
@@ -68,33 +69,39 @@ var questions = [
 	},
 ];
 
-//alternatively provide a default value of n/a for questions that are not asked
+// ask() function initiates a new round of inquirer questions for a new employee type
 function ask() {
   inquirer.prompt(questions).then((answers) => {
-    output.push(answers.name);
-	output.push(answers.email);
-	output.push(answers.id);
-	output.push(answers.role);
-	if(answers.role === 'Manager'){
-		output.push(answers.office)
+	// user response values will be pushed to a newed-up, role-specific, employee sub-class object
+
+	if(answers.role === 'Manager'){		
+		//instantiate a new <<Manager>> object with the inquirer response values passed as parameters
+		// including the response to the conditional, role-specific, <<officeNumber>> question.
+		employees.push(new Manager(answers.name, answers.id, answers.email, answers.officeNumber ));
 	} 
 	else if (answers.role === 'Engineer'){
-		output.push(answers.github)
+		//instantiate a new <<Engineer>> object with the inquirer response values passed as parameters
+		// including the response to the conditional, role-specific,<<github>> question.
+		employees.push(new Engineer(answers.name, answers.id, answers.email, answers.github ));
 	}	
 	else if (answers.role === 'Intern'){
-		output.push(answers.school)
+		//instantiate a new <<Intern>> object with the inquirer response values passed as parameters
+		// including the response to the conditional, role-specific, <<school>> question.
+		employees.push(new Intern(answers.name, answers.id, answers.email, answers.school ));
 	}
+
+	//determines if another round of inquirer prompts will be presented, or if current values passed to render funciton
     if (answers.askAgain) {
       ask();
     } else {
-	   // only render output to html if this condition is reached.
-	   //output.join
-	  console.log('\n');
-      console.log('Final output:', output.join(', '));
-    }
+	   // Once user has added all desired employees, pass the employee array to render function
+	 console.log("\n Employees array to be passed to render function: \n");
+	 console.log(employees);
+	}
   });
 }
 
+// runs the first round of inquirer prompts
 ask();
 
 // TODO After the user has input all employees desired, call the `render` function (required
@@ -106,15 +113,3 @@ ask();
 // `output` folder. You can use the variable `outputPath` above target this location.
 // Hint: you may need to check if the `output` folder exists and create it if it
 // does not.
-
-//---------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------
-//HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work! ```
